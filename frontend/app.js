@@ -449,7 +449,8 @@ function updateTradePageUI(ticker) {
 // ==================== WEBSOCKET ====================
 
 function connectWebSocket() {
-    ws = new WebSocket('ws://localhost:3000');
+    const wsUrl = API_URL.replace(/^http/, 'ws');
+    ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
         console.log('✅ WebSocket connected');
