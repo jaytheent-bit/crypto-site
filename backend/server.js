@@ -56,7 +56,7 @@ async function initializeDatabase() {
     console.log('✅ Database schema initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing database schema:', error.message);
-    console.log('⚠️  Continuing startup - you may need to run: psql -d fynor_clone -f backend/schema.sql');
+    console.log('⚠️  Continuing startup - you may need to run: psql -d crypto_site -f backend/schema.sql');
   }
 }
 
