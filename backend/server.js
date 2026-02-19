@@ -49,13 +49,9 @@ async function initializeDatabase() {
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     
-    // Execute schema line by line to handle multiple statements
-    const statements = schema.split(';').filter(stmt => stmt.trim());
-    for (const statement of statements) {
-      if (statement.trim()) {
-        await pool.query(statement);
-      }
-    }
+    // Execute the entire schema as one query to properly handle multi-line
+    // PL/pgSQL blocks (functions/triggers) which contain semicolons
+    await pool.query(schema);
     
     console.log('✅ Database schema initialized successfully');
   } catch (error) {
@@ -237,16 +233,27 @@ app.post('/auth/login', async (req, res) => {
 
 // Register
 app.post('/auth/register', async (req, res) => {
+  let client;
   try {
     const { email, password, full_name } = req.body;
 
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    client = await pool.connect();
+
+    await client.query('BEGIN');
+
     // Check if user exists
-    const existing = await pool.query(
+    const existing = await client.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
     );
 
     if (existing.rows.length > 0) {
+      await client.query('ROLLBACK');
       return res.status(400).json({ error: 'User already exists' });
     }
 
@@ -254,20 +261,22 @@ app.post('/auth/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const result = await pool.query(
+    const result = await client.query(
       `INSERT INTO users (email, password, full_name) 
        VALUES ($1, $2, $3) RETURNING id, email, full_name`,
-      [email, hashedPassword, full_name]
+      [email, hashedPassword, full_name || email.split('@')[0]]
     );
 
     const user = result.rows[0];
 
     // Create initial wallets
-    await pool.query(
+    await client.query(
       `INSERT INTO wallets (user_id, currency, balance) 
        VALUES ($1, 'BTC', 0), ($1, 'ETH', 0), ($1, 'USDT', 1000)`,
       [user.id]
     );
+
+    await client.query('COMMIT');
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -284,8 +293,16 @@ app.post('/auth/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Register error:', error);
+    if (client) await client.query('ROLLBACK');
+    console.error('Register error details:', {
+      message: error.message,
+      stack: error.stack,
+      detail: error.detail,
+      code: error.code
+    });
     res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (client) client.release();
   }
 });
 
