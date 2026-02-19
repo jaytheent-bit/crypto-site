@@ -47,6 +47,34 @@
         .phone-frame {
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
+        /* Alert styles */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        .alert-error {
+            background-color: rgba(244, 63, 94, 0.15);
+            color: #f43f5e;
+            border: 1px solid #f43f5e;
+        }
+        .alert-info {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
     </style>
 </head>
 <body class="bg-brand-dark text-brand-white font-sans min-h-screen flex flex-col relative overflow-x-hidden">
@@ -69,7 +97,7 @@
             </a>
             <button class="text-brand-white text-sm hover:text-brand-yellow transition-colors">Download</button>
             <!-- Theme Toggle -->
-            <button class="text-brand-white hover:text-brand-yellow transition-colors">
+            <button id="themeToggle" class="text-brand-white hover:text-brand-yellow transition-colors" onclick="toggleTheme()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>

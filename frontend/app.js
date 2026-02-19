@@ -902,6 +902,31 @@ function initFAQ() {
     });
 }
 
+// ==================== THEME TOGGLE ====================
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle('dark');
+    
+    // Store preference in localStorage
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// Initialize theme on page load
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const html = document.documentElement;
+    
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+    } else {
+        html.classList.remove('dark');
+    }
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', initializeTheme);
+
 // Make new functions global
 window.loadWalletPage = loadWalletPage;
 window.loadOrdersPage = loadOrdersPage;
@@ -913,3 +938,6 @@ window.copyToClipboard = copyToClipboard;
 window.loadOrders = loadOrdersPage;
 window.placeOrder = placeOrder;
 window.loadOpenOrders = loadOpenOrders;
+window.toggleTheme = toggleTheme;
+window.handleLogin = handleLogin;
+window.handleRegister = handleRegister;
